@@ -53,22 +53,23 @@ class Transaction(val transactionsQueue: TransactionQueue,
       def doTransaction() = {
           // TODO - project task 3
           // Extend this method to satisfy requirements.
+          this.attempt += 1
+
           val fromAccount = this.from
           val toAccount = this.to
 
-          while(this.attempt<this.allowedAttemps && this.status != TransactionStatus.SUCCESS){
-            this.attempt += 1
-            lazy val withdrawAmount = fromAccount.withdraw(amount)
-            lazy val depositAmount = toAccount.deposit(amount)
-            withdrawAmount match {
+          lazy val withdrawAmount = fromAccount.withdraw(amount)
+          lazy val depositAmount = toAccount.deposit(amount)
+
+          withdrawAmount match {
+              case Right(string) => println(string)
+              case Left(number) => depositAmount match {
                 case Right(string) => println(string)
-                case Left(number) => depositAmount match {
-                  case Right(string) => println(string)
-                  case Left(number) => this.status = TransactionStatus.SUCCESS
-                }
-            }
+                case Left(number) => this.status = TransactionStatus.SUCCESS
+              }
           }
-          if(this.status != TransactionStatus.SUCCESS){
+
+          if(this.attempt>=this.allowedAttemps){
             this.status = TransactionStatus.FAILED
           }
       }
