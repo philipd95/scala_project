@@ -47,9 +47,17 @@ class Transaction(val transactionsQueue: TransactionQueue,
 
   var status: TransactionStatus.Value = TransactionStatus.PENDING
   var attempt = 0
-
+  
+  /* 
+  Function that checks if the transaction is pending, 
+  if its pending it performs doTransaction
+  */
   override def run: Unit = {
-
+      /*
+      Function which receives a transaction and checks if the transaction can be 
+      performed between the sender and receiver
+      Marks the transaction as SUCCESS or FAILED. If neither it stays PENDING
+      */
       def doTransaction() = {
           // TODO - project task 3
           // Extend this method to satisfy requirements.
@@ -62,16 +70,17 @@ class Transaction(val transactionsQueue: TransactionQueue,
           lazy val depositAmount = toAccount.deposit(amount)
 
           withdrawAmount match {
+            case Right(string) => println(string)
+            case Left(number) => depositAmount match {
               case Right(string) => println(string)
-              case Left(number) => depositAmount match {
-                case Right(string) => println(string)
-                case Left(number) => this.status = TransactionStatus.SUCCESS
-              }
+              case Left(number) => this.status = TransactionStatus.SUCCESS
+            }
           }
 
-          if(this.attempt>=this.allowedAttemps){
+          if(this.attempt == this.allowedAttemps && this.status == TransactionStatus.PENDING){
             this.status = TransactionStatus.FAILED
           }
+          
       }
 
       // TODO - project task 3
