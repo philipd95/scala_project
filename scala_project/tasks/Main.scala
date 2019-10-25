@@ -1,3 +1,4 @@
+import java.util.concurrent.atomic.AtomicInteger; 
 object Tasks extends App {
   println("TASK 1")
   var aList = new Array[Int](50)
@@ -50,6 +51,7 @@ object Tasks extends App {
     counter += 1
   }
   def printCounter() : Unit = {
+    println("Task 2b")
     println(counter)
   }
 
@@ -59,9 +61,20 @@ object Tasks extends App {
   // b) This phenomenon is called race condition. This can be a problem when we expect eg. an ID to be atomic.
 
   // c)
-  def atomicIncreaseCounter() = this.synchronized {
-    counter += 1
+  //def atomicIncreaseCounter() = this.synchronized {
+  //  counter += 1
+  //}
+  val atomicCounter = new AtomicInteger(0)
+  def atomicIncreaseCounter() {
+    atomicCounter.getAndIncrement()
   }
+  def printAtomic() : Unit = {
+    println("Task 2c")
+    println(atomicCounter)
+  }
+  createThread(atomicIncreaseCounter).start
+  createThread(atomicIncreaseCounter).start
+  createThread(printAtomic).start
 
   // d)
   // DEADLOCK: A situation in which two or more executions wait for each other to complete an action before proceeding
@@ -93,6 +106,7 @@ object Tasks extends App {
   }
   val t1 = createThread(printStart2)
   val t2 = createThread(printStep)
+  println("task 2d")
   t1.start
   t2.start
   t1.join()
